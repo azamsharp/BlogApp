@@ -11,19 +11,34 @@ import SwiftUI
 struct ContentView: View {
     
     @ObservedObject private var postListVM = PostListViewModel()
+    @State private var isPresented: Bool = false
     
     var body: some View {
         
-        List(postListVM.posts, id: \.title) { post in
-            Text(post.title)
-        }
-        
+        VStack {
+            
+            List(postListVM.posts, id: \.title) { post in
+                Text(post.title)
+            }
+                
             .onAppear {
                 self.postListVM.fetchAllPosts()
+            }
+            
+            .sheet(isPresented: $isPresented, onDismiss: {
+                
+            }) {
+                AddPostView()
+            }
         }
+        .navigationBarTitle("Posts")
+        .navigationBarItems(trailing: Button("Add Post") {
+            self.isPresented = true 
+        })
+            .embedInNavigationView()
         
     }
-   
+    
 }
 
 struct ContentView_Previews: PreviewProvider {

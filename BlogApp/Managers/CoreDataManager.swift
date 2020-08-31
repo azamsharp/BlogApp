@@ -19,6 +19,15 @@ class CoreDataManager {
         self.moc = moc
     }
     
+    func savePost(post: Post) throws {
+        self.moc.insert(post)
+        try save()
+    }
+    
+    private func save() throws {
+        try self.moc.save()
+    }
+    
     func getAllPosts() -> [Post] {
         
         var posts = [Post]()
