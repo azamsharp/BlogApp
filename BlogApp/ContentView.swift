@@ -13,12 +13,32 @@ struct ContentView: View {
     @ObservedObject private var postListVM = PostListViewModel()
     @State private var isPresented: Bool = false
     
+    
+    private func deletePost(at indexSet: IndexSet) {
+        
+        var deleted = false
+        
+        indexSet.forEach { index in
+            let post = postListVM.posts[index]
+            deleted = postListVM.deletePost(post)
+        }
+        
+        if deleted {
+            postListVM.fetchAllPosts()
+        }
+        
+    }
+    
     var body: some View {
         
         VStack {
             
-            List(postListVM.posts, id: \.title) { post in
-                Text(post.title)
+            List {
+                ForEach(postListVM.posts, id: \.postId) { post in
+                    NavigationLink(destination: PostDetailView(post: post)) {
+                        Text(post.title)
+                    }
+                }.onDelete(perform: self.deletePost)
             }
                 
             .onAppear {
@@ -26,7 +46,7 @@ struct ContentView: View {
             }
             
             .sheet(isPresented: $isPresented, onDismiss: {
-                
+                self.postListVM.fetchAllPosts()
             }) {
                 AddPostView()
             }
